@@ -9,7 +9,7 @@ function MyApp({ Component, pageProps }) {
         <div className="flex mt-4 justify-center text-2xl">
           <Link href="/">
             <a className="mr-4 text-blue-500">
-              主页
+              NFTs
             </a>
           </Link>
           <Link href="/create-item">

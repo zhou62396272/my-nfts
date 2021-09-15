@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
-import Image from 'next/image'
 import Fortmatic from "fortmatic";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3Modal from "web3modal"
@@ -12,6 +11,8 @@ import { nftmarketaddress, nftaddress, nftabi, nftmarketabi } from '../config'
 export default function Home() {
   const [nfts, setNfts] = useState([])
   const [loaded, setLoaded] = useState('not-loaded')
+  const [Address, setAddress] = useState()
+  const [getType, setGetType] = useState()
   useEffect(() => {
     loadNFTs()
   }, [])
@@ -39,14 +40,16 @@ export default function Home() {
     });
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
-    const tokenContract = new ethers.Contract(provider, nftaddress, nftabi)
-    const marketContract = new ethers.Contract(provider, nftmarketaddress, nftmarketabi)
+    const tokenContract = new ethers.Contract(nftaddress, nftabi, provider)
+    const marketContract = new ethers.Contract(nftmarketaddress, nftmarketabi, provider)
+    console.log(tokenContract);
+    console.log(marketContract);
     const data = await marketContract.fetchMarketItems()
 
     const items = await Promise.all(data.map(async i => {
       const tokenUri = await tokenContract.tokenURI(i.tokenId)
       const meta = await axios.get(tokenUri)
-      let price = web3.utils.fromWei(i.price.toString(), 'ether')
+      let price = web3.utils.fromWei(i.price.toString(), 'ether');
       let item = {
         price,
         tokenId: i.tokenId.toNumber(),
@@ -54,35 +57,34 @@ export default function Home() {
         owner: i.owner,
         image: meta.data.image,
         name: meta.data.name,
-        description: meta.data.description
+        description: meta.data.description,
+        type: meta.data.type
       }
       return item
     }))
-    console.log('items', items);
+    console.log('items:', items);
     setNfts(items)
     setLoaded('loaded')
+    setAddress(connection.selectedAddress)
   }
 
 
   if (loaded === 'loaded' && !nfts.length) return (<h1 className="p-20 text-4xl">暂无NFTs!</h1>)
   return (
-    <div className="flex justify-center">
-      <div style={{ width: 1000 }}>
+    <div className="flex justify-center items-center flex-col">
+      <button onClick={loadNFTs} className="bg-blue-500 text-white rounded p-4 shadow-lg" disabled={Address && Address}>{Address && Address ? Address : '连接钱包'}</button>
+      <div style={{ width: 1000 }} className="flex justify-between flex-wrap">
         {
-          nfts.map((nft, i) => {
+          nfts.map((nft, i) => (
             <div key={i} className="border rounded-2xl flex justify-center items-center flex-col" style={{ width: 260, height: 340, marginTop: 20 }}>
-              <Image
-                className="rounded-xl"
-                src={nft.image}
-                alt="Picture of the author"
-                width={230}
-                height={260}
-              />
+              {
+                nft.type === 'image' ? (<img src={nft.image} className="rounded-xl" style={{ width: '220px', height: '220px' }} />) : nft.type === 'video' ? (<video autoPlay loop className="rounded-xl" width={220} src={nft.image} />) : !nft.type ? (<img src={nft.image} className="rounded-xl" style={{ width: '220px', height: '220px' }} />) : (<img src={nft.image} className="rounded-xl" style={{ width: '220px', height: '220px' }} />)
+              }
               <p>{nft.name}</p>
               <p>{nft.description}</p>
-              <p>{nft.price}</p>
+              <p className="flex items-center"><img width="10" src="/eth.svg" alt="eth" />&nbsp;{nft.price}</p>
             </div>
-          })
+          ))
         }
       </div>
     </div>

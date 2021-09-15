@@ -14,6 +14,7 @@ const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
 export default function Home() {
   const [fileUrl, setFileUrl] = useState(null)
   const [formInput, updateFormInput] = useState({ price: '', name: '', description: '' })
+  const [fileType, setFileType] = useState('')
   const router = useRouter()
 
   async function createSale(url) {
@@ -52,16 +53,19 @@ export default function Home() {
       )
       const url = `https://ipfs.infura.io/ipfs/${added.path}`
       setFileUrl(url)
+      setFileType(file.type)
     } catch (error) {
       console.log('错误的文件: ', error);
     }
   }
   async function createMarket() {
+    const realType = fileType.indexOf('image') != -1 ? 'image' : 'video'
+    console.log(realType);
     const { name, description, price } = formInput
     if (!name || !description || !price || !fileUrl) return
     // first, upload to IPFS
     const data = JSON.stringify({
-      name, description, image: fileUrl
+      name, description, image: fileUrl, type: realType
     })
     try {
       const added = await client.add(data)
@@ -84,7 +88,7 @@ export default function Home() {
           />
         </div>
         <div className="my-5">
-          <span>描述1 </span>
+          <span>描述 </span>
           <input
             placeholder=""
             className="border-b"
@@ -106,11 +110,13 @@ export default function Home() {
             className="my-4"
             onChange={onChange}
           />
-          {
+          {fileUrl && fileType.indexOf('image') == -1 ? (<video width={260} autoPlay loop src={fileUrl} />) : (<img style={{ width: 230, height: 260 }} className="rounded mt-4" src={fileUrl}></img>)}
+          {/* {
             fileUrl && (
               <img style={{ width: 230, height: 260 }} className="rounded mt-4" src={fileUrl}></img>
+              <video width={260} autoPlay loop src={fileUrl} />
             )
-          }
+          } */}
         </div>
         <button onClick={createMarket} className="mt-4 bg-blue-500 text-white rounded p-4 shadow-lg">创建NFT</button>
       </div>
