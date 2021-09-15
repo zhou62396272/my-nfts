@@ -84,7 +84,7 @@ export default function Home() {
           />
         </div>
         <div className="my-5">
-          <span>描述 </span>
+          <span>描述1 </span>
           <input
             placeholder=""
             className="border-b"
