@@ -19,7 +19,7 @@ function MyApp({ Component, pageProps }) {
           </Link>
           <Link href="/my-nfts">
             <a className="mr-4 text-blue-500">
-              我的NFTSs
+              我的NFTs
             </a>
           </Link>
         </div>

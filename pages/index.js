@@ -12,7 +12,6 @@ export default function Home() {
   const [nfts, setNfts] = useState([])
   const [loaded, setLoaded] = useState('not-loaded')
   const [Address, setAddress] = useState()
-  const [getType, setGetType] = useState()
   useEffect(() => {
     loadNFTs()
   }, [])
@@ -67,6 +66,22 @@ export default function Home() {
     setLoaded('loaded')
     setAddress(connection.selectedAddress)
   }
+  async function buyNft(nft) {
+    const web3Modal = new Web3Modal({
+      network: 'mainnet',
+      cacheProvider: true
+    });
+    const connection = await web3Modal.connect()
+    const provider = new ethers.providers.Web3Provider(connection)
+    const signer = provider.getSigner()
+    const contract = new ethers.Contract(nftmarketaddress, nftmarketabi, signer)
+    
+    const price = web3.utils.toWei(nft.price.toString(), 'ether')
+    console.log('price: ', price);
+    const transaction = await contract.createMarketSale(nftaddress, nft.tokenId,{value: price})
+    await transaction.wait()
+    loadNFTs()
+  }
 
 
   if (loaded === 'loaded' && !nfts.length) return (<h1 className="p-20 text-4xl">暂无NFTs!</h1>)
@@ -83,6 +98,7 @@ export default function Home() {
               <p>{nft.name}</p>
               <p>{nft.description}</p>
               <p className="flex items-center"><img width="10" src="/eth.svg" alt="eth" />&nbsp;{nft.price}</p>
+              <button onClick={() => buyNft(nft)} className="bg-blue-500 text-white rounded p-1 shadow-lg w-28">购买</button>
             </div>
           ))
         }
