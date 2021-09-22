@@ -1,14 +1,15 @@
 import { useState } from 'react'
-import Web3Modal from 'web3modal'
-import web3 from 'web3'
-import { useRouter } from 'next/router'
 import { ethers } from 'ethers'
 import { create as ipfsHttpClient } from 'ipfs-http-client'
-import {
-  nftmarketaddress, nftaddress, nftabi, nftmarketabi
-} from '../config'
+import { useRouter } from 'next/router'
+import Web3Modal from 'web3modal'
+import web3 from 'web3'
 
 const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
+
+import {
+  nftmarketaddress, nftaddress,nftabi,nftmarketabi
+} from '../config'
 
 
 export default function Home() {
@@ -22,22 +23,22 @@ export default function Home() {
       cacheProvider: true,
     });
     const connection = await web3Modal.connect()
-    const provider = new ethers.providers.Web3Provider(connection)
+    const provider = new ethers.providers.Web3Provider(connection)    
     const signer = provider.getSigner()
-
-    let contract = new ethers.Contract(nftaddress, nftabi, signer)
+    
+    let contract = new ethers.Contract(nftaddress,nftabi, signer)
     let transaction = await contract.createToken(url)
     let tx = await transaction.wait()
     let event = tx.events[0]
     let value = event.args[2]
     let tokenId = value.toNumber()
     const price = web3.utils.toWei(formInput.price, 'ether')
-
+  
     const listingPrice = web3.utils.toWei('0.1', 'ether')
 
     contract = new ethers.Contract(nftmarketaddress, nftmarketabi, signer)
     transaction = await contract.createMarketItem(nftaddress, tokenId, price, { value: listingPrice })
-
+    
     await transaction.wait()
     router.push('/')
   }
@@ -53,8 +54,8 @@ export default function Home() {
       const url = `https://ipfs.infura.io/ipfs/${added.path}`
       setFileUrl(url)
     } catch (error) {
-      console.log('错误的文件: ', error);
-    }
+      console.log('Error uploading file: ', error);
+    }  
   }
   async function createMarket() {
     const { name, description, price } = formInput
@@ -68,51 +69,42 @@ export default function Home() {
       const url = `https://ipfs.infura.io/ipfs/${added.path}`
       createSale(url)
     } catch (error) {
-      console.log('Error: ', error);
-    }
+      console.log('Error uploading file: ', error);
+    }  
   }
 
   return (
     <div className="flex justify-center">
-      <div className="flex flex-col mt-8 rounded p-4">
-        <div>
-          <span>名称 </span>
-          <input
-            placeholder=""
-            className="border-b"
-            onChange={e => updateFormInput({ ...formInput, name: e.target.value })}
-          />
-        </div>
-        <div className="my-5">
-          <span>描述1 </span>
-          <input
-            placeholder=""
-            className="border-b"
-            onChange={e => updateFormInput({ ...formInput, description: e.target.value })}
-          />
-        </div>
-        <div className="">
-          <span>价格 </span>
-          <input
-            placeholder=""
-            className="border-b"
-            onChange={e => updateFormInput({ ...formInput, price: e.target.value })}
-          />
-        </div>
-        <div>
-          <input
-            type="file"
-            name="NFT"
-            className="my-4"
-            onChange={onChange}
-          />
-          {
-            fileUrl && (
-              <img style={{ width: 230, height: 260 }} className="rounded mt-4" src={fileUrl}></img>
-            )
-          }
-        </div>
-        <button onClick={createMarket} className="mt-4 bg-blue-500 text-white rounded p-4 shadow-lg">创建NFT</button>
+      <div className="w-1/2 flex flex-col pb-12">
+        <input 
+          placeholder="NFT Name"
+          className="mt-8 border rounded p-4"
+          onChange={e => updateFormInput({ ...formInput, name: e.target.value })}
+        />
+        <input
+          placeholder="NFT Description"
+          className="mt-2 border rounded p-4"
+          onChange={e => updateFormInput({ ...formInput, description: e.target.value })}
+        />
+        <input
+          placeholder="NFT Price in Eth"
+          className="mt-2 border rounded p-4"
+          onChange={e => updateFormInput({ ...formInput, price: e.target.value })}
+        />
+        <input
+          type="file"
+          name="NFT"
+          className="my-4"
+          onChange={onChange}
+        />
+        {
+          fileUrl && (
+            <img className="rounded mt-4" width="350" src={fileUrl} />
+          )
+        }
+        <button onClick={createMarket} className="mt-4 bg-blue-500 text-white rounded p-4 shadow-lg">
+          Create NFT
+        </button>
       </div>
     </div>
   )
