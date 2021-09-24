@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
 import Web3Modal from "web3modal"
@@ -11,20 +10,6 @@ export default function Home() {
   const [nfts, setNfts] = useState([])
   const [loaded, setLoaded] = useState('not-loaded')
   const [Address, setAddress] = useState()
-=======
-import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
-import web3 from 'web3'
-import axios from 'axios'
-import Web3Modal from "web3modal"
-
-import {
-  nftmarketaddress, nftaddress, nftabi, nftmarketabi
-} from '../config'
-export default function Home() {
-  const [nfts, setNfts] = useState([])
-  const [loaded, setLoaded] = useState('not-loaded')
->>>>>>> 7b41deefae43e30b5c95e35d56b35e1fc2d6482a
 
   useEffect(() => {
     loadNFTs()
@@ -55,7 +40,6 @@ export default function Home() {
         image: meta.data.image,
         name: meta.data.name,
         description: meta.data.description,
-<<<<<<< HEAD
         type: meta.data.type
       }
       return item
@@ -84,31 +68,6 @@ export default function Home() {
             </div>
           ))
         }
-=======
-      }
-      return item
-    }))
-    console.log('items: ', items)
-    setNfts(items)
-    setLoaded('loaded')
-  }
-  if (loaded === 'loaded' && !nfts.length) return (<h1 className="p-20 text-4xl">No NFTs!</h1>)
-  return (
-    <div className="flex justify-center">
-      <div style={{ width: 900 }}>
-        <div className="grid grid-cols-2 gap-4 pt-8">
-          {
-            nfts.map((nft, i) => (
-              <div key={i} className="border p-4 shadow">
-                <img src={nft.image} className="rounded" />
-                <p className="text-2xl my-4 font-bold">Price paid: {nft.price} Ether</p>
-                <p className="text-2xl my-4 font-bold">Name: {nft.name}</p>
-                <p className="text-2xl my-4 font-bold">Description: {nft.description}</p>
-              </div>
-            ))
-          }
-        </div>
->>>>>>> 7b41deefae43e30b5c95e35d56b35e1fc2d6482a
       </div>
     </div>
   )
