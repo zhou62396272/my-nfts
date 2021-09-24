@@ -78,6 +78,7 @@ export default function Home() {
     
     const price = web3.utils.toWei(nft.price.toString(), 'ether')
     console.log('price: ', price);
+    console.log(nft);
     const transaction = await contract.createMarketSale(nftaddress, nft.tokenId,{value: price})
     await transaction.wait()
     loadNFTs()

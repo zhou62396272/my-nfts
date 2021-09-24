@@ -29,6 +29,7 @@ export default function Home() {
     let contract = new ethers.Contract(nftaddress, nftabi, signer)
     let transaction = await contract.createToken(url)
     let tx = await transaction.wait()
+    console.log(tx);
     let event = tx.events[0]
     let value = event.args[2]
     let tokenId = value.toNumber()
